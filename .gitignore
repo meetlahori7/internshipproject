@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+cropped_tanks/
+.env
+.streamlit/secrets.toml
+btcas_api_report_*.json
+fix_app.py
