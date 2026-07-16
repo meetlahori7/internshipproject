@@ -12,15 +12,15 @@ Classes (from btcas_yolov8s_v2_best.pt):
      6: 'pipesupport'}
 
 Maintenance decision (v3 rule, per info.md):
-    Normal  = connected_pipe AND pipesupport AND bio tank top surface
-              all detected overlapping the tank across tracked frames.
+    Normal  = bio tank top surface detected overlapping the tank.
     Maintenance Required = otherwise.
 
-Coach counting algorithm (couplers + stairs together):
-    A coach boundary is confirmed when BOTH a cbc_coupler AND a Stairs
-    detection occur in the temporal gap between two tank-group clusters
-    (per camera side). Fallback: if no couplers/stairs are detected at all,
-    coach count falls back to the number of distinct tank tracks.
+Coach counting algorithm (couplers OR stairs):
+    A coach boundary is confirmed when EITHER a cbc_coupler OR a Stairs
+    detection appears in the temporal gap between two tank-group clusters.
+    Fallback 1: if no coupler/stairs detected, use timestamp-gap heuristic
+    (>5 sec gap between tanks = new coach, tuned for LHB local trains).
+    Fallback 2: if still 1 coach but multiple tanks, each tank = 1 coach.
 """
 
 from __future__ import annotations
@@ -51,6 +51,11 @@ CHILD_OVERLAP_THRESHOLD = 0.25
 INFERENCE_EVERY_N = 5
 RESIZE_WIDTH = 640
 RESIZE_HEIGHT = 480
+
+# Timestamp-gap fallback: if the time gap between two consecutive tank
+# detections exceeds this threshold (seconds), treat it as a coach boundary.
+# Tuned for LHB local trains at typical inspection speeds (5–15 km/h).
+TIMESTAMP_GAP_THRESHOLD_SEC = 5.0
 
 CROPPED_TANKS_DIR = "cropped_tanks"
 
@@ -191,13 +196,21 @@ def _run_inference(frame: np.ndarray) -> list[Box]:
 # TRACKING & DETECTION FLOW
 # ─────────────────────────────────────────
 def _associate_tank(
-    box: Box, tracks: list[TankTrack], current_max_id: list[int]
+    box: Box,
+    tracks: list[TankTrack],
+    current_max_id: list[int],
+    current_frame: int,
 ) -> TankTrack:
-    """Match a tank detection to an existing track or create a new one."""
+    """Match a tank detection to an existing track or create a new one.
+
+    A track is considered stale (no longer matchable) if it hasn't been
+    seen for more than CONFIRMATION_GAP_FRAMES frames.
+    """
     best_track: Optional[TankTrack] = None
     best_iou = TANK_OVERLAP_IOU
     for t in tracks:
-        if (t.last_seen_frame + CONFIRMATION_GAP_FRAMES) < 0:
+        # Skip stale tracks that haven't been seen recently
+        if (current_frame - t.last_seen_frame) > CONFIRMATION_GAP_FRAMES:
             continue
         iou = box.iou(t.last_box)
         if iou > best_iou:
@@ -210,19 +223,18 @@ def _associate_tank(
             tank_id=current_max_id[0],
             camera_side="",
             last_box=box,
-            first_seen_frame=-1,
-            last_seen_frame=-1,
+            first_seen_frame=current_frame,
+            last_seen_frame=current_frame,
         )
-        best_track.camera_side = ""
         tracks.append(best_track)
 
     best_track.last_box = box
-    best_track.last_seen_frame = -1
+    best_track.last_seen_frame = current_frame
     best_track.frame_count += 1
     best_track.conf_sum += box.conf
     if box.conf > best_track.best_frame_conf:
         best_track.best_frame_conf = box.conf
-        best_track.best_frame_index = -1
+        best_track.best_frame_index = current_frame
     return best_track
 
 
@@ -254,21 +266,21 @@ def _compute_coach_count(
     tank_track_count: int,
 ) -> int:
     """
-    Coach counting algorithm — couplers + stairs together.
+    Coach counting algorithm — couplers OR stairs.
 
-    A boundary between two coaches is confirmed ONLY when BOTH a cbc_coupler
-    AND a Stairs detection appear in the temporal gap between two tank-group
-    clusters (per camera side). This reduces false counts that would arise
-    from spurious single-class detections.
+    A boundary between two coaches is confirmed when EITHER a cbc_coupler
+    OR a Stairs detection appears in the temporal gap between two tank-group
+    clusters (per camera side).  Using OR instead of AND because the model's
+    recall for these classes is low (~38–45%), making co-occurrence rare.
 
-    Fallback: if no coupler+stairs co-occurrence is detected at all, fall back
-    to the number of distinct tank tracks (so we never report 0 coaches when
-    tanks were detected but the secondary classes were missed).
+    Returns the number of confirmed coach boundaries + 1 (= number of
+    coaches).  Fallback: if no boundaries detected at all, returns
+    tank_track_count so we never report 0 coaches when tanks were found.
     """
     if tank_track_count == 0:
         return 0
 
-    coaches = 0
+    boundaries = 0
     saw_coupler_in_gap = False
     saw_stairs_in_gap = False
 
@@ -284,18 +296,18 @@ def _compute_coach_count(
         elif cls_id == CLS_STAIRS:
             saw_stairs_in_gap = True
 
-        if event.get("kind") == "gap_end" and saw_coupler_in_gap and saw_stairs_in_gap:
-            coaches += 1
+        if event.get("kind") == "gap_end" and (saw_coupler_in_gap or saw_stairs_in_gap):
+            boundaries += 1
             saw_coupler_in_gap = False
             saw_stairs_in_gap = False
 
-    if coaches == 0:
+    if boundaries == 0:
         return tank_track_count
-    return coaches
+    return boundaries + 1
 
 
 def _get_confirmed_gap_ends(events: list[dict]) -> list[int]:
-    """Return frame indices of gap ends where coupler+stairs co-occurred."""
+    """Return frame indices of gap ends where coupler OR stairs was detected."""
     ends: list[int] = []
     saw_coupler = False
     saw_stairs = False
@@ -308,7 +320,7 @@ def _get_confirmed_gap_ends(events: list[dict]) -> list[int]:
                 saw_coupler = True
             elif event["cls"] == CLS_STAIRS:
                 saw_stairs = True
-        elif event["kind"] == "gap_end" and saw_coupler and saw_stairs:
+        elif event["kind"] == "gap_end" and (saw_coupler or saw_stairs):
             ends.append(event["frame"])
     return ends
 
@@ -486,20 +498,15 @@ def process_video(video_path: str, camera_side: str) -> list[dict]:
         tank_boxes = [b for b in boxes if b.cls == CLS_TANK]
 
         for tb in tank_boxes:
-            track = _associate_tank(tb, tracks, current_max_id)
+            track = _associate_tank(tb, tracks, current_max_id, frame_idx)
             track.camera_side = camera_side
-            track.last_seen_frame = frame_idx
-            track.first_seen_frame = (
-                track.first_seen_frame if track.first_seen_frame >= 0 else frame_idx
-            )
             track.timestamp_sec = frame_idx / fps if fps > 0 else 0.0
 
             if tb.conf >= track.best_frame_conf:
                 track.best_frame_conf = tb.conf
                 track.best_frame_index = frame_idx
-                if track.raw_image is None:
-                    track.raw_image = frame.copy()
-                    track.best_frame_boxes = list(boxes)
+                track.raw_image = frame.copy()
+                track.best_frame_boxes = list(boxes)
                 track.last_box = tb
 
             for cb in boxes:
@@ -547,6 +554,27 @@ def process_video(video_path: str, camera_side: str) -> list[dict]:
     confirmed_gap_ends = _get_confirmed_gap_ends(events)
     coach_map = _assign_coach_numbers(finalized, confirmed_gap_ends)
 
+    # ── Fallback: timestamp-gap heuristic ──────────────────────────
+    # If the coupler/stairs algorithm still yields 1 coach but we have
+    # multiple tanks, use the temporal gap between consecutive tank
+    # first-seen times. A gap > TIMESTAMP_GAP_THRESHOLD_SEC seconds
+    # is treated as a coach boundary (tuned for LHB local trains).
+    if coach_count <= 1 and tank_track_count > 1:
+        finalized.sort(key=lambda t: t.first_seen_frame)
+        current_coach = 1
+        for i, t in enumerate(finalized):
+            if i == 0:
+                coach_map[t.tank_id] = 1
+            else:
+                time_gap = (
+                    (t.first_seen_frame - finalized[i - 1].first_seen_frame) / fps
+                    if fps > 0 else 0.0
+                )
+                if time_gap > TIMESTAMP_GAP_THRESHOLD_SEC:
+                    current_coach += 1
+                coach_map[t.tank_id] = current_coach
+        coach_count = current_coach
+
     finalized.sort(key=lambda t: (t.first_seen_frame, t.tank_id))
 
     reports: list[dict] = []
@@ -590,7 +618,8 @@ def summarize(reports: list[dict], side: str, side_prefix: str) -> dict:
     total = len(reports)
     maint = sum(1 for r in reports if r["maintenance_status"] == "Maintenance Required")
     normal = total - maint
-    coach_count = reports[0]["coach_number"] if reports else 0
+    # Use max coach_number across all reports — not just the first one
+    coach_count = max((r["coach_number"] for r in reports), default=0)
     return {
         "side": side,
         "side_prefix": side_prefix,
