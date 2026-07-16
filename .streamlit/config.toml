@@ -1,0 +1,10 @@
+[server]
+# Increase max upload size from default 200MB to 500MB
+maxUploadSize = 500
+# Enable larger message size for video data
+maxMessageSize = 500
+# Faster file watcher (less overhead on cloud)
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false

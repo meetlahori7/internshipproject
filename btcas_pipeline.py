@@ -451,12 +451,21 @@ def _save_crop_and_annotated(
 # ─────────────────────────────────────────
 # MAIN PROCESSING ENTRY POINT
 # ─────────────────────────────────────────
-def process_video(video_path: str, camera_side: str) -> list[dict]:
+def process_video(
+    video_path: str,
+    camera_side: str,
+    progress_callback=None,
+) -> list[dict]:
     """
     Process a video file frame-by-frame, producing one tank report dict per
-    detected bio tank. Also performs coach counting via the coupler+stairs
-    co-occurrence algorithm; the coach count is injected onto each tank record
-    as `coach_count_side` so the UI can pick it up from any record.
+    detected bio tank.  Also performs coach counting via the coupler/stairs
+    algorithm with a timestamp-gap fallback for LHB trains.
+
+    Args:
+        video_path:        Path to the video file.
+        camera_side:       "LEFT" or "RIGHT".
+        progress_callback: Optional callable(current_frame, total_frames)
+                           for progress reporting (e.g. Streamlit progress bar).
 
     Uses frame skipping (YOLO every INFERENCE_EVERY_N frames) and pre-inference
     resize for speed on CPU.
@@ -488,6 +497,10 @@ def process_video(video_path: str, camera_side: str) -> list[dict]:
         if not ret:
             break
         frame_idx += 1
+
+        # Report progress to caller (e.g. Streamlit progress bar)
+        if progress_callback and total_frames > 0:
+            progress_callback(frame_idx, total_frames)
 
         if frame_idx - last_infer_frame >= INFERENCE_EVERY_N:
             cached_boxes = _run_inference(frame)

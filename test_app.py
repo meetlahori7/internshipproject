@@ -288,47 +288,90 @@ with tab_video:
     if lv and rv:
         if st.button("▶  RUN VIDEO INSPECTION", use_container_width=True,
                      type="primary", key="btn_vid"):
-            with st.spinner("Running full pipeline: tank tracking → coach counting → maintenance decision..."):
-                try:
-                    jid = uuid.uuid4().hex[:8]
-                    with tempfile.TemporaryDirectory(prefix=f"btcas_{jid}_") as tmp:
-                        lp = os.path.join(tmp, "left.mp4")
-                        rp = os.path.join(tmp, "right.mp4")
-                        with open(lp,"wb") as f: f.write(lv.getvalue())
-                        with open(rp,"wb") as f: f.write(rv.getvalue())
-                        lr = process_video(lp, camera_side="LEFT")
-                        rr = process_video(rp, camera_side="RIGHT")
+            try:
+                jid = uuid.uuid4().hex[:8]
 
-                    ls = summarize(lr, "LEFT", "L")
-                    rs = summarize(rr, "RIGHT", "R")
-                    ts_now = datetime.now().isoformat()
-                    run_id = f"INSP_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{jid}"
+                # Progress bar + status text for real-time feedback
+                progress_bar = st.progress(0)
+                status_text = st.empty()
 
-                    st.session_state["vres"] = {
-                        "job_id":                jid,
-                        "inspection_run_id":     run_id,
-                        "timestamp":             ts_now,
-                        "status":                "COMPLETE",
-                        "inspection":            lr + rr,
-                        "total_tanks":           len(lr)+len(rr),
-                        "left_tanks":            len(lr),
-                        "right_tanks":           len(rr),
-                        "total_coaches_counted": max(ls["coach_count"], rs["coach_count"]),
-                        "left_coach_count":      ls["coach_count"],
-                        "right_coach_count":     rs["coach_count"],
-                    }
+                def make_progress_cb(label, offset=0.0, weight=0.5):
+                    """Create a progress callback for one video (LEFT or RIGHT)."""
+                    def cb(current_frame, total_frames):
+                        pct = current_frame / max(1, total_frames)
+                        overall = offset + pct * weight
+                        progress_bar.progress(min(overall, 1.0))
+                        status_text.markdown(
+                            f'<span style="font-family:IBM Plex Mono,monospace;'
+                            f'font-size:12px;color:#f0a500">'
+                            f'⏳ {label}: frame {current_frame}/{total_frames} '
+                            f'({int(pct*100)}%)</span>',
+                            unsafe_allow_html=True,
+                        )
+                    return cb
 
-                    # Auto-save API contract JSON
-                    api_result = build_api_result(
-                        inspection_run_id=run_id,
-                        processing_timestamp=ts_now,
-                        left_reports=lr,
-                        right_reports=rr,
+                with tempfile.TemporaryDirectory(prefix=f"btcas_{jid}_") as tmp:
+                    lp = os.path.join(tmp, "left.mp4")
+                    rp = os.path.join(tmp, "right.mp4")
+                    with open(lp,"wb") as f: f.write(lv.getvalue())
+                    with open(rp,"wb") as f: f.write(rv.getvalue())
+
+                    status_text.markdown(
+                        '<span style="font-family:IBM Plex Mono,monospace;'
+                        'font-size:12px;color:#64b5f6">'
+                        '⏳ Processing LEFT camera...</span>',
+                        unsafe_allow_html=True,
                     )
-                    save_api_report(api_result, output_dir=".")
+                    lr = process_video(lp, camera_side="LEFT",
+                                       progress_callback=make_progress_cb("LEFT", 0.0, 0.5))
 
-                except Exception as e:
-                    st.error(f"Pipeline error: {e}")
+                    status_text.markdown(
+                        '<span style="font-family:IBM Plex Mono,monospace;'
+                        'font-size:12px;color:#64b5f6">'
+                        '⏳ Processing RIGHT camera...</span>',
+                        unsafe_allow_html=True,
+                    )
+                    rr = process_video(rp, camera_side="RIGHT",
+                                       progress_callback=make_progress_cb("RIGHT", 0.5, 0.5))
+
+                progress_bar.progress(1.0)
+                status_text.markdown(
+                    '<span style="font-family:IBM Plex Mono,monospace;'
+                    'font-size:12px;color:#4caf50">'
+                    '✓ Processing complete!</span>',
+                    unsafe_allow_html=True,
+                )
+
+                ls = summarize(lr, "LEFT", "L")
+                rs = summarize(rr, "RIGHT", "R")
+                ts_now = datetime.now().isoformat()
+                run_id = f"INSP_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{jid}"
+
+                st.session_state["vres"] = {
+                    "job_id":                jid,
+                    "inspection_run_id":     run_id,
+                    "timestamp":             ts_now,
+                    "status":                "COMPLETE",
+                    "inspection":            lr + rr,
+                    "total_tanks":           len(lr)+len(rr),
+                    "left_tanks":            len(lr),
+                    "right_tanks":           len(rr),
+                    "total_coaches_counted": max(ls["coach_count"], rs["coach_count"]),
+                    "left_coach_count":      ls["coach_count"],
+                    "right_coach_count":     rs["coach_count"],
+                }
+
+                # Auto-save API contract JSON
+                api_result = build_api_result(
+                    inspection_run_id=run_id,
+                    processing_timestamp=ts_now,
+                    left_reports=lr,
+                    right_reports=rr,
+                )
+                save_api_report(api_result, output_dir=".")
+
+            except Exception as e:
+                st.error(f"Pipeline error: {e}")
 
     if "vres" in st.session_state:
         res   = st.session_state["vres"]
