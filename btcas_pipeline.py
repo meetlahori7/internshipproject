@@ -41,11 +41,11 @@ from ultralytics import YOLO
 # ─────────────────────────────────────────
 MODEL_PATH = "btcas_yolov8s_v2_best.pt"
 
-CONF_THRESHOLD = 0.5
+CONF_THRESHOLD = 0.4
 IOU_THRESHOLD = 0.35
 
-CONFIRMATION_GAP_FRAMES = 60
-TANK_OVERLAP_IOU = 0.1
+CONFIRMATION_GAP_FRAMES = 25
+TANK_OVERLAP_IOU = 0.2
 CHILD_OVERLAP_THRESHOLD = 0.25
 
 INFERENCE_EVERY_N = 5
@@ -302,7 +302,7 @@ def _compute_coach_count(
             saw_stairs_in_gap = False
 
     if boundaries == 0:
-        return tank_track_count
+        return 1
     return boundaries + 1
 
 

@@ -61,36 +61,36 @@ st.set_page_config(
 # ─────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
-html, body, [class*="css"] {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background-color: #0d0d0d;
-    color: #e0e0e0;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+html, body, [class*="css"], .stApp {
+    font-family: 'Inter', sans-serif;
+    background-color: #010102 !important;
+    color: #f7f8f8 !important;
 }
-.btcas-header { border-bottom: 2px solid #f0a500; padding-bottom: 12px; margin-bottom: 28px; }
-.btcas-title  { font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:#f0a500; letter-spacing:0.12em; margin:0; }
-.btcas-subtitle { font-size:12px; color:#666; letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; }
-.badge { display:inline-block; padding:3px 10px; border-radius:3px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; }
-.badge-ok     { background:#1a3a1a; color:#4caf50; border:1px solid #4caf50; }
-.badge-warn   { background:#3a2a1a; color:#f0a500; border:1px solid #f0a500; }
-.badge-danger { background:#3a1a1a; color:#f44336; border:1px solid #f44336; }
-.badge-info   { background:#1a2a3a; color:#64b5f6; border:1px solid #64b5f6; }
-.coach-card   { background:#161616; border:1px solid #2a2a2a; border-left:4px solid #f0a500; border-radius:4px; padding:16px 20px; margin-bottom:12px; }
+.btcas-header { border-bottom: 2px solid #23252a; padding-bottom: 12px; margin-bottom: 28px; }
+.btcas-title  { font-family:'Inter',sans-serif; font-size:22px; font-weight:600; color:#5e6ad2; letter-spacing:-0.4px; margin:0; }
+.btcas-subtitle { font-size:12px; color:#8a8f98; letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; }
+.badge { display:inline-block; padding:3px 10px; border-radius:9999px; font-family:'Inter',sans-serif; font-size:12px; font-weight:500; }
+.badge-ok     { background:#162a1a; color:#27a644; border:1px solid #27a644; }
+.badge-warn   { background:#2e2210; color:#d4af37; border:1px solid #d4af37; }
+.badge-danger { background:#2a1616; color:#f44336; border:1px solid #f44336; }
+.badge-info   { background:#141b2c; color:#5e6ad2; border:1px solid #5e6ad2; }
+.coach-card   { background:#0f1011; border:1px solid #23252a; border-left:4px solid #5e6ad2; border-radius:12px; padding:24px; margin-bottom:12px; }
 .coach-card.maintenance { border-left-color:#f44336; }
-.coach-id { font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:600; color:#f0a500; margin-bottom:12px; }
+.coach-id { font-family:'Inter',sans-serif; font-size:20px; font-weight:600; color:#f7f8f8; margin-bottom:12px; letter-spacing:-0.2px; }
 .insp-table { width:100%; border-collapse:collapse; font-size:13px; }
-.insp-table th { text-align:left; color:#888; font-weight:400; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:6px 12px 6px 0; border-bottom:1px solid #2a2a2a; }
-.insp-table td { padding:8px 12px 8px 0; border-bottom:1px solid #1e1e1e; color:#d0d0d0; font-family:'IBM Plex Mono',monospace; font-size:13px; vertical-align:middle; }
+.insp-table th { text-align:left; color:#8a8f98; font-weight:400; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:6px 12px 6px 0; border-bottom:1px solid #23252a; }
+.insp-table td { padding:8px 12px 8px 0; border-bottom:1px solid #141516; color:#d0d6e0; font-family:'Inter',sans-serif; font-size:13px; vertical-align:middle; }
 .insp-table tr:last-child td { border-bottom:none; }
-.summary-bar { background:#111; border:1px solid #2a2a2a; border-radius:4px; padding:16px 20px; margin-bottom:24px; }
-.summary-num { font-family:'IBM Plex Mono',monospace; font-size:28px; font-weight:600; color:#f0a500; display:block; }
-.summary-label { font-size:11px; color:#666; text-transform:uppercase; letter-spacing:0.08em; }
-.cam-divider { font-family:'IBM Plex Mono',monospace; font-size:11px; color:#444; text-transform:uppercase; letter-spacing:0.1em; border-bottom:1px solid #222; padding-bottom:6px; margin:20px 0 14px 0; display:block; }
-.limitation-note { background:#1a1a0a; border:1px solid #3a3a00; border-radius:3px; padding:10px 14px; font-size:11px; color:#888; font-family:'IBM Plex Mono',monospace; margin-top:8px; }
-.photo-note { background:#0d1a1a; border:1px solid #003333; border-radius:3px; padding:8px 12px; font-size:11px; color:#777; font-family:'IBM Plex Mono',monospace; margin:8px 0; }
-.det-pill { display:inline-block; margin:2px 4px 2px 0; padding:2px 8px; border-radius:2px; font-family:'IBM Plex Mono',monospace; font-size:11px; background:#1e1e1e; border:1px solid #333; }
+.summary-bar { background:#0f1011; border:1px solid #23252a; border-radius:12px; padding:24px; margin-bottom:24px; }
+.summary-num { font-family:'Inter',sans-serif; font-size:28px; font-weight:600; color:#5e6ad2; display:block; letter-spacing:-1.0px; }
+.summary-label { font-size:11px; color:#8a8f98; text-transform:uppercase; letter-spacing:0.08em; }
+.cam-divider { font-family:'Inter',sans-serif; font-size:11px; color:#8a8f98; text-transform:uppercase; letter-spacing:0.1em; border-bottom:1px solid #23252a; padding-bottom:6px; margin:20px 0 14px 0; display:block; }
+.limitation-note { background:#0f1011; border:1px solid #23252a; border-radius:8px; padding:10px 14px; font-size:11px; color:#8a8f98; font-family:'Inter',sans-serif; margin-top:8px; }
+.photo-note { background:#0f1011; border:1px solid #23252a; border-radius:8px; padding:8px 12px; font-size:11px; color:#8a8f98; font-family:'Inter',sans-serif; margin:8px 0; }
+.det-pill { display:inline-block; margin:2px 4px 2px 0; padding:2px 8px; border-radius:9999px; font-family:'Inter',sans-serif; font-size:11px; background:#141516; border:1px solid #23252a; color:#d0d6e0; }
 </style>
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────
@@ -193,8 +193,8 @@ def badge(value, field):
 
 
 def conf_color(conf):
-    c = "#4caf50" if conf >= 0.65 else "#f0a500" if conf >= 0.45 else "#f44336"
-    return f'<span style="color:{c};font-family:IBM Plex Mono,monospace">{conf:.3f}</span>'
+    c = "#27a644" if conf >= 0.65 else "#d4af37" if conf >= 0.45 else "#f44336"
+    return f'<span style="color:{c};font-family:ui-monospace,monospace">{conf:.3f}</span>'
 
 
 def render_card(r):
@@ -242,7 +242,7 @@ st.markdown("""
 try:
     _load_model()
     st.markdown(
-        f'<p style="font-family:IBM Plex Mono,monospace;font-size:12px;color:#4caf50">'
+        f'<p style="font-family:ui-monospace,monospace;font-size:12px;color:#27a644">'
         f'● MODEL LOADED — {MODEL_PATH} &nbsp;|&nbsp; conf={CONF_THRESHOLD} &nbsp;'
         f'iou={IOU_THRESHOLD} &nbsp;classes={len(CLASS_NAMES)}</p>',
         unsafe_allow_html=True
@@ -302,8 +302,8 @@ with tab_video:
                         overall = offset + pct * weight
                         progress_bar.progress(min(overall, 1.0))
                         status_text.markdown(
-                            f'<span style="font-family:IBM Plex Mono,monospace;'
-                            f'font-size:12px;color:#f0a500">'
+                            f'<span style="font-family:ui-monospace,monospace;'
+                            f'font-size:12px;color:#5e6ad2">'
                             f'⏳ {label}: frame {current_frame}/{total_frames} '
                             f'({int(pct*100)}%)</span>',
                             unsafe_allow_html=True,
@@ -317,8 +317,8 @@ with tab_video:
                     with open(rp,"wb") as f: f.write(rv.getvalue())
 
                     status_text.markdown(
-                        '<span style="font-family:IBM Plex Mono,monospace;'
-                        'font-size:12px;color:#64b5f6">'
+                        '<span style="font-family:ui-monospace,monospace;'
+                        'font-size:12px;color:#5e6ad2">'
                         '⏳ Processing LEFT camera...</span>',
                         unsafe_allow_html=True,
                     )
@@ -326,8 +326,8 @@ with tab_video:
                                        progress_callback=make_progress_cb("LEFT", 0.0, 0.5))
 
                     status_text.markdown(
-                        '<span style="font-family:IBM Plex Mono,monospace;'
-                        'font-size:12px;color:#64b5f6">'
+                        '<span style="font-family:ui-monospace,monospace;'
+                        'font-size:12px;color:#5e6ad2">'
                         '⏳ Processing RIGHT camera...</span>',
                         unsafe_allow_html=True,
                     )
@@ -336,8 +336,8 @@ with tab_video:
 
                 progress_bar.progress(1.0)
                 status_text.markdown(
-                    '<span style="font-family:IBM Plex Mono,monospace;'
-                    'font-size:12px;color:#4caf50">'
+                    '<span style="font-family:ui-monospace,monospace;'
+                    'font-size:12px;color:#27a644">'
                     '✓ Processing complete!</span>',
                     unsafe_allow_html=True,
                 )
@@ -385,17 +385,17 @@ with tab_video:
         <div class="summary-bar">
           <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
             <div><span class="summary-num">{total}</span><span class="summary-label">Total Tanks</span></div>
-            <div><span class="summary-num" style="color:#a855f7">{res['total_coaches_counted']}</span>
+            <div><span class="summary-num" style="color:#8b5cf6">{res['total_coaches_counted']}</span>
                  <span class="summary-label">Coaches (L:{lcc}·R:{rcc})</span></div>
-            <div><span class="summary-num" style="color:#64b5f6">{res['left_tanks']}</span>
+            <div><span class="summary-num" style="color:#8a8f98">{res['left_tanks']}</span>
                  <span class="summary-label">Left Tanks</span></div>
-            <div><span class="summary-num" style="color:#64b5f6">{res['right_tanks']}</span>
+            <div><span class="summary-num" style="color:#8a8f98">{res['right_tanks']}</span>
                  <span class="summary-label">Right Tanks</span></div>
-            <div><span class="summary-num" style="color:#4caf50">{total-maint}</span>
+            <div><span class="summary-num" style="color:#27a644">{total-maint}</span>
                  <span class="summary-label">Normal</span></div>
             <div><span class="summary-num" style="color:#f44336">{maint}</span>
                  <span class="summary-label">Maintenance Req.</span></div>
-            <div><span class="summary-num" style="font-size:13px;color:#555">{res['job_id']}</span>
+            <div><span class="summary-num" style="font-size:13px;color:#62666d">{res['job_id']}</span>
                  <span class="summary-label">Job ID</span></div>
           </div>
         </div>

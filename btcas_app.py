@@ -30,31 +30,31 @@ st.set_page_config(
 # ─────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background-color: #0d0d0d;
-    color: #e0e0e0;
+html, body, [class*="css"], .stApp {
+    font-family: 'Inter', sans-serif;
+    background-color: #010102 !important;
+    color: #f7f8f8 !important;
 }
 
 /* Header */
 .btcas-header {
-    border-bottom: 2px solid #f0a500;
+    border-bottom: 2px solid #23252a;
     padding-bottom: 12px;
     margin-bottom: 28px;
 }
 .btcas-title {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 22px;
     font-weight: 600;
-    color: #f0a500;
-    letter-spacing: 0.12em;
+    color: #5e6ad2;
+    letter-spacing: -0.4px;
     margin: 0;
 }
 .btcas-subtitle {
     font-size: 12px;
-    color: #666;
+    color: #8a8f98;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-top: 4px;
@@ -64,36 +64,36 @@ html, body, [class*="css"] {
 .badge {
     display: inline-block;
     padding: 3px 10px;
-    border-radius: 3px;
-    font-family: 'IBM Plex Mono', monospace;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.05em;
 }
-.badge-ok      { background: #1a3a1a; color: #4caf50; border: 1px solid #4caf50; }
-.badge-warn    { background: #3a2a1a; color: #f0a500; border: 1px solid #f0a500; }
-.badge-danger  { background: #3a1a1a; color: #f44336; border: 1px solid #f44336; }
-.badge-info    { background: #1a2a3a; color: #64b5f6; border: 1px solid #64b5f6; }
+.badge-ok      { background: #162a1a; color: #27a644; border: 1px solid #27a644; }
+.badge-warn    { background: #2e2210; color: #d4af37; border: 1px solid #d4af37; }
+.badge-danger  { background: #2a1616; color: #f44336; border: 1px solid #f44336; }
+.badge-info    { background: #141b2c; color: #5e6ad2; border: 1px solid #5e6ad2; }
 
 /* Coach card */
 .coach-card {
-    background: #161616;
-    border: 1px solid #2a2a2a;
-    border-left: 4px solid #f0a500;
-    border-radius: 4px;
-    padding: 16px 20px;
+    background: #0f1011;
+    border: 1px solid #23252a;
+    border-left: 4px solid #5e6ad2;
+    border-radius: 12px;
+    padding: 24px;
     margin-bottom: 12px;
 }
 .coach-card.maintenance {
     border-left-color: #f44336;
 }
 .coach-id {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 20px;
     font-weight: 600;
-    color: #f0a500;
+    color: #f7f8f8;
     margin-bottom: 12px;
-    letter-spacing: 0.1em;
+    letter-spacing: -0.2px;
 }
 
 /* Table */
@@ -104,19 +104,19 @@ html, body, [class*="css"] {
 }
 .insp-table th {
     text-align: left;
-    color: #888;
+    color: #8a8f98;
     font-weight: 400;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     padding: 6px 12px 6px 0;
-    border-bottom: 1px solid #2a2a2a;
+    border-bottom: 1px solid #23252a;
 }
 .insp-table td {
     padding: 8px 12px 8px 0;
-    border-bottom: 1px solid #1e1e1e;
-    color: #d0d0d0;
-    font-family: 'IBM Plex Mono', monospace;
+    border-bottom: 1px solid #141516;
+    color: #d0d6e0;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     vertical-align: middle;
 }
@@ -124,10 +124,10 @@ html, body, [class*="css"] {
 
 /* Summary bar */
 .summary-bar {
-    background: #111;
-    border: 1px solid #2a2a2a;
-    border-radius: 4px;
-    padding: 16px 20px;
+    background: #0f1011;
+    border: 1px solid #23252a;
+    border-radius: 12px;
+    padding: 24px;
     margin-bottom: 24px;
     display: flex;
     gap: 40px;
@@ -135,27 +135,28 @@ html, body, [class*="css"] {
 }
 .summary-stat { text-align: center; }
 .summary-num {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 28px;
     font-weight: 600;
-    color: #f0a500;
+    color: #5e6ad2;
     display: block;
+    letter-spacing: -1.0px;
 }
 .summary-label {
     font-size: 11px;
-    color: #666;
+    color: #8a8f98;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
 /* Server status */
-.server-ok   { color: #4caf50; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
-.server-down { color: #f44336; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.server-ok   { color: #27a644; font-family: ui-monospace, monospace; font-size: 12px; }
+.server-down { color: #f44336; font-family: ui-monospace, monospace; font-size: 12px; }
 
 /* Upload zone */
 .upload-label {
     font-size: 11px;
-    color: #888;
+    color: #8a8f98;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 6px;
@@ -164,25 +165,25 @@ html, body, [class*="css"] {
 
 /* Divider */
 .cam-divider {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 11px;
-    color: #444;
+    color: #8a8f98;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid #23252a;
     padding-bottom: 6px;
     margin: 20px 0 14px 0;
 }
 
 /* Limitation note */
 .limitation-note {
-    background: #1a1a0a;
-    border: 1px solid #3a3a00;
-    border-radius: 3px;
+    background: #0f1011;
+    border: 1px solid #23252a;
+    border-radius: 8px;
     padding: 10px 14px;
     font-size: 11px;
-    color: #888;
-    font-family: 'IBM Plex Mono', monospace;
+    color: #8a8f98;
+    font-family: 'Inter', sans-serif;
     margin-top: 8px;
 }
 
@@ -231,8 +232,8 @@ def badge(value, field):
 
 def conf_bar(conf):
     """Return confidence as colored mono text."""
-    color = "#4caf50" if conf >= 0.65 else "#f0a500" if conf >= 0.45 else "#f44336"
-    return f'<span style="color:{color};font-family:IBM Plex Mono,monospace">{conf:.2f}</span>'
+    color = "#27a644" if conf >= 0.65 else "#d4af37" if conf >= 0.45 else "#f44336"
+    return f'<span style="color:{color};font-family:ui-monospace,monospace">{conf:.2f}</span>'
 
 
 def render_coach_card(coach):
@@ -429,19 +430,19 @@ if "result" in st.session_state:
             <span class="summary-label">Total Tanks</span>
         </div>
         <div class="summary-stat">
-            <span class="summary-num" style="color:#a855f7">{coach_count}</span>
+            <span class="summary-num" style="color:#5e6ad2">{coach_count}</span>
             <span class="summary-label">Coaches (L:{l_coach_count}·R:{r_coach_count})</span>
         </div>
         <div class="summary-stat">
-            <span class="summary-num" style="color:#64b5f6">{left_c}</span>
+            <span class="summary-num" style="color:#8a8f98">{left_c}</span>
             <span class="summary-label">Left Tanks</span>
         </div>
         <div class="summary-stat">
-            <span class="summary-num" style="color:#64b5f6">{right_c}</span>
+            <span class="summary-num" style="color:#8a8f98">{right_c}</span>
             <span class="summary-label">Right Tanks</span>
         </div>
         <div class="summary-stat">
-            <span class="summary-num" style="color:#4caf50">{normal}</span>
+            <span class="summary-num" style="color:#27a644">{normal}</span>
             <span class="summary-label">Normal</span>
         </div>
         <div class="summary-stat">
@@ -449,7 +450,7 @@ if "result" in st.session_state:
             <span class="summary-label">Maintenance Required</span>
         </div>
         <div class="summary-stat">
-            <span class="summary-num" style="color:#888;font-size:14px">{result.get('job_id','—')}</span>
+            <span class="summary-num" style="color:#62666d;font-size:14px">{result.get('job_id','—')}</span>
             <span class="summary-label">Job ID</span>
         </div>
     </div>
