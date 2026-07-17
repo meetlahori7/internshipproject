@@ -361,9 +361,8 @@ if can_inspect:
 
                     left_summary = summarize(left_reports, "LEFT", "L")
                     right_summary = summarize(right_reports, "RIGHT", "R")
-                    total_coaches_counted = max(
-                        left_summary["coach_count"], right_summary["coach_count"]
-                    )
+                    import math
+                    total_coaches_counted = math.ceil((len(left_reports) + len(right_reports)) / 4.0) if (len(left_reports) + len(right_reports)) > 0 else 0
 
                     ts_now = datetime.now().isoformat()
                     inspection_run_id = f"INSP_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{job_id}"
@@ -387,7 +386,7 @@ if can_inspect:
                             "bio_tank_top_surface_recall": 0.383,
                             "connected_pipe_recall": 0.457,
                             "surface_status_note": "Not Clean = inconclusive, not confirmed dirty",
-                            "coach_counting_rule": "Coupler + Stairs co-occurrence (fallback: tank tracks)",
+                            "coach_counting_rule": "Total tanks (left + right) / 4",
                             "maintenance_rule": "Normal = bio tank top surface detected (surface clean)",
                         },
                     }
@@ -496,7 +495,7 @@ if "result" in st.session_state:
         ⚠ MODEL {result.get('model_version','YOLOv8s_v2')} — 7 CLASSES:<br>
         &nbsp;&nbsp;· {cls_str}<br>
         &nbsp;&nbsp;· Status: {result.get('status','—')} &nbsp;|&nbsp; Run: {run_id}<br>
-        &nbsp;&nbsp;· Coach count: {result.get('total_coaches_counted',0)} (coupler + stairs co-occurrence, fallback: tank tracks)<br>
+        &nbsp;&nbsp;· Coach count: {result.get('total_coaches_counted',0)} (total tanks left+right / 4)<br>
         &nbsp;&nbsp;· Maintenance rule: Normal = bio tank top surface detected (surface clean → no maintenance)<br>
         &nbsp;&nbsp;· Surface recall ~38%, Connected Pipe recall ~45% — "Not Connected" may be missed detection, not confirmed absence
     </div>

@@ -356,7 +356,7 @@ with tab_video:
                     "total_tanks":           len(lr)+len(rr),
                     "left_tanks":            len(lr),
                     "right_tanks":           len(rr),
-                    "total_coaches_counted": max(ls["coach_count"], rs["coach_count"]),
+                    "total_coaches_counted": math.ceil((len(lr) + len(rr)) / 4.0) if (len(lr) + len(rr)) > 0 else 0,
                     "left_coach_count":      ls["coach_count"],
                     "right_coach_count":     rs["coach_count"],
                 }
@@ -422,7 +422,7 @@ with tab_video:
         st.markdown(f"""
         <div class="limitation-note">
         ⚠ Status: {res.get('status','—')} &nbsp;|&nbsp; Run: {res.get('inspection_run_id',res.get('job_id','—'))}<br>
-        ⚠ Coach counting: cbc_coupler + Stairs co-occurrence (fallback: distinct tank tracks)<br>
+        ⚠ Coach counting: Total tanks (left + right) / 4<br>
         ⚠ Maintenance: Normal = bio tank top surface detected (surface clean → no maintenance)<br>
         ⚠ Surface recall ~38% · Pipe recall ~45% — absences may be missed detections not confirmed faults
         </div>""", unsafe_allow_html=True)

@@ -49,6 +49,7 @@ TANK_OVERLAP_IOU = 0.2
 CHILD_OVERLAP_THRESHOLD = 0.25
 
 INFERENCE_EVERY_N = 5
+FRAME_SKIP = 5
 RESIZE_WIDTH = 640
 RESIZE_HEIGHT = 480
 
@@ -491,6 +492,8 @@ def process_video(
     last_infer_frame = -INFERENCE_EVERY_N - 1
 
     frame_idx = -1
+    processed_count = 0
+    total_processed = (total_frames + FRAME_SKIP - 1) // FRAME_SKIP if total_frames > 0 else 0
 
     while True:
         ret, frame = cap.read()
@@ -498,9 +501,10 @@ def process_video(
             break
         frame_idx += 1
 
+        processed_count += 1
         # Report progress to caller (e.g. Streamlit progress bar)
-        if progress_callback and total_frames > 0:
-            progress_callback(frame_idx, total_frames)
+        if progress_callback and total_processed > 0:
+            progress_callback(processed_count, total_processed)
 
         if frame_idx - last_infer_frame >= INFERENCE_EVERY_N:
             cached_boxes = _run_inference(frame)
@@ -536,57 +540,31 @@ def process_video(
             if cb.cls != CLS_TANK:
                 all_detections.append({"frame": frame_idx, "cls": cb.cls})
 
+        # Fast-skip the next FRAME_SKIP - 1 frames
+        for _ in range(FRAME_SKIP - 1):
+            if cap.grab():
+                frame_idx += 1
+            else:
+                break
+
     cap.release()
 
     finalized: list[TankTrack] = [
-        t for t in tracks if t.frame_count >= 1 and t.camera_side == camera_side
+        t for t in tracks if t.frame_count >= 8 and t.camera_side == camera_side
     ]
 
     tank_track_count = len(finalized)
 
-    cluster_starts = []
-    cluster_ends = []
-    sorted_tank_frames = sorted(set(frames_with_tank))
-    if sorted_tank_frames:
-        cluster_starts.append(sorted_tank_frames[0])
-        for i in range(1, len(sorted_tank_frames)):
-            if sorted_tank_frames[i] - sorted_tank_frames[i - 1] > 8:
-                cluster_ends.append(sorted_tank_frames[i - 1])
-                cluster_starts.append(sorted_tank_frames[i])
-        cluster_ends.append(sorted_tank_frames[-1])
-
-    gaps: list[tuple[int, int]] = []
-    for i in range(1, len(cluster_starts)):
-        gap_start = cluster_ends[i - 1] + 1
-        gap_end = cluster_starts[i] - 1
-        if gap_end >= gap_start:
-            gaps.append((gap_start, gap_end))
-
-    events = _build_inter_tank_events(all_detections, gaps)
-    coach_count = _compute_coach_count(events, tank_track_count)
-    confirmed_gap_ends = _get_confirmed_gap_ends(events)
-    coach_map = _assign_coach_numbers(finalized, confirmed_gap_ends)
-
-    # ── Fallback: timestamp-gap heuristic ──────────────────────────
-    # If the coupler/stairs algorithm still yields 1 coach but we have
-    # multiple tanks, use the temporal gap between consecutive tank
-    # first-seen times. A gap > TIMESTAMP_GAP_THRESHOLD_SEC seconds
-    # is treated as a coach boundary (tuned for LHB local trains).
-    if coach_count <= 1 and tank_track_count > 1:
-        finalized.sort(key=lambda t: t.first_seen_frame)
-        current_coach = 1
-        for i, t in enumerate(finalized):
-            if i == 0:
-                coach_map[t.tank_id] = 1
-            else:
-                time_gap = (
-                    (t.first_seen_frame - finalized[i - 1].first_seen_frame) / fps
-                    if fps > 0 else 0.0
-                )
-                if time_gap > TIMESTAMP_GAP_THRESHOLD_SEC:
-                    current_coach += 1
-                coach_map[t.tank_id] = current_coach
-        coach_count = current_coach
+    # ── Coach assignment by sequential order ──────────────────────
+    # Each coach has 4 bio-tanks (2 on the left side, 2 on the right side).
+    # Therefore, every 2 tanks on a side belong to the same coach.
+    # We sort the finalized tracks by their first-seen frame and assign coach numbers.
+    import math
+    finalized.sort(key=lambda t: t.first_seen_frame)
+    coach_map = {}
+    for i, t in enumerate(finalized):
+        coach_map[t.tank_id] = (i // 2) + 1
+    coach_count = math.ceil(tank_track_count / 2.0) if tank_track_count > 0 else 0
 
     finalized.sort(key=lambda t: (t.first_seen_frame, t.tank_id))
 
