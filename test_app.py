@@ -71,9 +71,9 @@ st.markdown("""
   --apple-ink: #1d1d1f;
   --apple-ink-secondary: #6e6e73;
   --apple-ink-tertiary: #86868b;
-  --apple-bg: #f5f5f7;
-  --apple-surface: #ffffff;
-  --apple-hairline: #d2d2d7;
+  --apple-bg: #e4e4e9;
+  --apple-surface: #f2f2f6;
+  --apple-hairline: #c7c7cc;
   --apple-green: #34c759;
   --apple-orange: #ff9f0a;
   --apple-red: #ff3b30;
