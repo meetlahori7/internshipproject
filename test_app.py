@@ -814,7 +814,8 @@ with tab_photo:
                             for cn, cf in sorted(r["_detected"].items(), key=lambda x:-x[1]):
                                 color = CLASS_COLORS_BGR.get(cn,(150,150,150))
                                 hx    = "#{:02x}{:02x}{:02x}".format(color[2],color[1],color[0])
-                                pills += (f'<span class="det-pill" style="border-color:{hx};color:{hx}">'\n                                          f'{cn} {cf:.2f}</span>')
+                                pills += (f'<span class="det-pill" style="border-color:{hx};color:{hx}">'
+                                          f'{cn} {cf:.2f}</span>')
                             st.markdown(f'<div style="margin-bottom:8px">{pills}</div>',
                                         unsafe_allow_html=True)
                         else:
