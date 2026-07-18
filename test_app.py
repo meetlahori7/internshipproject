@@ -62,34 +62,290 @@ st.set_page_config(
 # ─────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-html, body, [class*="css"], .stApp {
-    font-family: 'Inter', sans-serif;
-    background-color: #010102 !important;
-    color: #f7f8f8 !important;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/* ── Apple Design System Tokens ── */
+:root {
+  --apple-blue: #0066cc;
+  --apple-blue-hover: #0071e3;
+  --apple-ink: #1d1d1f;
+  --apple-ink-secondary: #6e6e73;
+  --apple-ink-tertiary: #86868b;
+  --apple-bg: #f5f5f7;
+  --apple-surface: #ffffff;
+  --apple-hairline: #d2d2d7;
+  --apple-green: #34c759;
+  --apple-orange: #ff9f0a;
+  --apple-red: #ff3b30;
+  --apple-font: 'SF Pro Display', 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
 }
-.btcas-header { border-bottom: 2px solid #23252a; padding-bottom: 12px; margin-bottom: 28px; }
-.btcas-title  { font-family:'Inter',sans-serif; font-size:22px; font-weight:600; color:#5e6ad2; letter-spacing:-0.4px; margin:0; }
-.btcas-subtitle { font-size:12px; color:#8a8f98; letter-spacing:0.08em; text-transform:uppercase; margin-top:4px; }
-.badge { display:inline-block; padding:3px 10px; border-radius:9999px; font-family:'Inter',sans-serif; font-size:12px; font-weight:500; }
-.badge-ok     { background:#162a1a; color:#27a644; border:1px solid #27a644; }
-.badge-warn   { background:#2e2210; color:#d4af37; border:1px solid #d4af37; }
-.badge-danger { background:#2a1616; color:#f44336; border:1px solid #f44336; }
-.badge-info   { background:#141b2c; color:#5e6ad2; border:1px solid #5e6ad2; }
-.coach-card   { background:#0f1011; border:1px solid #23252a; border-left:4px solid #5e6ad2; border-radius:12px; padding:24px; margin-bottom:12px; }
-.coach-card.maintenance { border-left-color:#f44336; }
-.coach-id { font-family:'Inter',sans-serif; font-size:20px; font-weight:600; color:#f7f8f8; margin-bottom:12px; letter-spacing:-0.2px; }
-.insp-table { width:100%; border-collapse:collapse; font-size:13px; }
-.insp-table th { text-align:left; color:#8a8f98; font-weight:400; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; padding:6px 12px 6px 0; border-bottom:1px solid #23252a; }
-.insp-table td { padding:8px 12px 8px 0; border-bottom:1px solid #141516; color:#d0d6e0; font-family:'Inter',sans-serif; font-size:13px; vertical-align:middle; }
-.insp-table tr:last-child td { border-bottom:none; }
-.summary-bar { background:#0f1011; border:1px solid #23252a; border-radius:12px; padding:24px; margin-bottom:24px; }
-.summary-num { font-family:'Inter',sans-serif; font-size:28px; font-weight:600; color:#5e6ad2; display:block; letter-spacing:-1.0px; }
-.summary-label { font-size:11px; color:#8a8f98; text-transform:uppercase; letter-spacing:0.08em; }
-.cam-divider { font-family:'Inter',sans-serif; font-size:11px; color:#8a8f98; text-transform:uppercase; letter-spacing:0.1em; border-bottom:1px solid #23252a; padding-bottom:6px; margin:20px 0 14px 0; display:block; }
-.limitation-note { background:#0f1011; border:1px solid #23252a; border-radius:8px; padding:10px 14px; font-size:11px; color:#8a8f98; font-family:'Inter',sans-serif; margin-top:8px; }
-.photo-note { background:#0f1011; border:1px solid #23252a; border-radius:8px; padding:8px 12px; font-size:11px; color:#8a8f98; font-family:'Inter',sans-serif; margin:8px 0; }
-.det-pill { display:inline-block; margin:2px 4px 2px 0; padding:2px 8px; border-radius:9999px; font-family:'Inter',sans-serif; font-size:11px; background:#141516; border:1px solid #23252a; color:#d0d6e0; }
+
+html, body, [class*="css"], .stApp {
+  font-family: var(--apple-font) !important;
+  background-color: var(--apple-bg) !important;
+  color: var(--apple-ink) !important;
+}
+
+/* ── Header ── */
+.btcas-header {
+  border-bottom: 1px solid var(--apple-hairline);
+  padding: 20px 0;
+  margin-bottom: 32px;
+}
+.btcas-title {
+  font-family: var(--apple-font);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--apple-ink);
+  letter-spacing: -0.374px;
+  line-height: 1.14;
+  margin: 0;
+}
+.btcas-subtitle {
+  font-family: var(--apple-font);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--apple-ink-secondary);
+  letter-spacing: -0.224px;
+  margin-top: 6px;
+  text-transform: none;
+}
+
+/* ── Status Badges ── */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-family: var(--apple-font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.12px;
+  border: none;
+}
+.badge-ok     { background: rgba(52,199,89,0.12); color: #248a3d; }
+.badge-warn   { background: rgba(255,159,10,0.14); color: #c93400; }
+.badge-danger { background: rgba(255,59,48,0.12); color: #d70015; }
+.badge-info   { background: rgba(0,102,204,0.10); color: #0066cc; }
+
+/* ── Coach Card ── */
+.coach-card {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-hairline);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.coach-card.maintenance {
+  border-top: 2.5px solid var(--apple-red);
+}
+.coach-id {
+  font-family: var(--apple-font);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--apple-ink);
+  letter-spacing: 0.011em;
+  line-height: 1.19;
+  margin-bottom: 16px;
+}
+
+/* ── Inspection Table ── */
+.insp-table { width: 100%; border-collapse: collapse; }
+.insp-table th {
+  text-align: left;
+  color: var(--apple-ink-secondary);
+  font-family: var(--apple-font);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: -0.12px;
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  text-transform: none;
+}
+.insp-table td {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  color: var(--apple-ink);
+  font-family: var(--apple-font);
+  font-size: 14px;
+  letter-spacing: -0.224px;
+  vertical-align: middle;
+}
+.insp-table tr:last-child td { border-bottom: none; }
+
+/* ── Summary Bar ── */
+.summary-bar {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-hairline);
+  border-radius: 18px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+}
+.summary-num {
+  font-family: var(--apple-font);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--apple-blue);
+  display: block;
+  letter-spacing: -0.374px;
+  line-height: 1.14;
+}
+.summary-label {
+  font-family: var(--apple-font);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--apple-ink-secondary);
+  letter-spacing: -0.12px;
+  text-transform: none;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Section Divider ── */
+.cam-divider {
+  font-family: var(--apple-font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--apple-ink);
+  letter-spacing: -0.224px;
+  line-height: 1.29;
+  border-bottom: 1px solid var(--apple-hairline);
+  padding-bottom: 8px;
+  margin: 24px 0 16px 0;
+  display: block;
+  text-transform: none;
+}
+
+/* ── Notes ── */
+.limitation-note {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-hairline);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-family: var(--apple-font);
+  font-size: 12px;
+  color: var(--apple-ink-secondary);
+  letter-spacing: -0.12px;
+  line-height: 1.6;
+  margin-top: 12px;
+}
+.photo-note {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-hairline);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-family: var(--apple-font);
+  font-size: 13px;
+  color: var(--apple-ink-secondary);
+  letter-spacing: -0.12px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.det-pill {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-family: var(--apple-font);
+  font-size: 12px;
+  font-weight: 400;
+  background: rgba(0,0,0,0.03);
+  border: 1px solid var(--apple-hairline);
+  color: var(--apple-ink);
+  letter-spacing: -0.12px;
+}
+
+/* ── Streamlit Widget Overrides ── */
+.stTabs [data-baseweb="tab-list"] {
+  gap: 0;
+  background: var(--apple-surface);
+  border-radius: 12px;
+  border: 1px solid var(--apple-hairline);
+  padding: 4px;
+}
+.stTabs [data-baseweb="tab"] {
+  font-family: var(--apple-font);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.224px;
+  color: var(--apple-ink-secondary);
+  border-radius: 8px;
+  padding: 8px 20px;
+  background: transparent;
+}
+.stTabs [aria-selected="true"] {
+  background: var(--apple-bg) !important;
+  color: var(--apple-ink) !important;
+  font-weight: 600;
+}
+.stTabs [data-baseweb="tab-highlight"],
+.stTabs [data-baseweb="tab-border"] { display: none; }
+
+div.stButton > button[kind="primary"],
+div.stButton > button[data-testid="baseButton-primary"] {
+  background-color: var(--apple-blue) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  font-family: var(--apple-font) !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.374px !important;
+  padding: 11px 24px !important;
+  transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+div.stButton > button[kind="primary"]:hover,
+div.stButton > button[data-testid="baseButton-primary"]:hover {
+  background-color: var(--apple-blue-hover) !important;
+}
+div.stButton > button[kind="primary"]:active,
+div.stButton > button[data-testid="baseButton-primary"]:active {
+  transform: scale(0.97) !important;
+}
+
+div.stDownloadButton > button {
+  background-color: var(--apple-surface) !important;
+  color: var(--apple-blue) !important;
+  border: 1px solid var(--apple-blue) !important;
+  border-radius: 9999px !important;
+  font-family: var(--apple-font) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.224px !important;
+  padding: 11px 24px !important;
+  transition: transform 0.15s ease !important;
+}
+div.stDownloadButton > button:hover {
+  background-color: rgba(0,102,204,0.04) !important;
+}
+div.stDownloadButton > button:active {
+  transform: scale(0.97) !important;
+}
+
+[data-testid="stFileUploader"] {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-hairline);
+  border-radius: 18px;
+  padding: 20px;
+}
+[data-testid="stFileUploader"] section { border: none !important; }
+
+[data-testid="stMetric"] {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-hairline);
+  border-radius: 18px;
+  padding: 20px;
+}
+[data-testid="stMetricValue"] {
+  font-family: var(--apple-font) !important;
+  color: var(--apple-blue) !important;
+}
+[data-testid="stMetricLabel"] {
+  font-family: var(--apple-font) !important;
+  color: var(--apple-ink-secondary) !important;
+}
+
+.stProgress > div > div { background-color: var(--apple-blue) !important; }
+.stAlert { border-radius: 12px; font-family: var(--apple-font); }
 </style>
 """,unsafe_allow_html=True)
 
@@ -194,8 +450,8 @@ def badge(value, field):
 
 
 def conf_color(conf):
-    c = "#27a644" if conf >= 0.65 else "#d4af37" if conf >= 0.45 else "#f44336"
-    return f'<span style="color:{c};font-family:ui-monospace,monospace">{conf:.3f}</span>'
+    c = "#34c759" if conf >= 0.65 else "#ff9f0a" if conf >= 0.45 else "#ff3b30"
+    return f'<span style="color:{c};font-weight:600">{conf:.3f}</span>'
 
 
 def render_card(r):
@@ -235,7 +491,7 @@ def render_card(r):
 # ─────────────────────────────────────────
 st.markdown("""
 <div class="btcas-header">
-    <p class="btcas-title">▶ BTCAS TEST — VIDEO + PHOTO INSPECTION</p>
+    <p class="btcas-title">BTCAS Test — Video + Photo Inspection</p>
     <p class="btcas-subtitle">Central Railway · LHB Coach · Test Mode · YOLOv8s v2</p>
 </div>
 """, unsafe_allow_html=True)
@@ -243,8 +499,8 @@ st.markdown("""
 try:
     _load_model()
     st.markdown(
-        f'<p style="font-family:ui-monospace,monospace;font-size:12px;color:#27a644">'
-        f'● MODEL LOADED — {MODEL_PATH} &nbsp;|&nbsp; conf={CONF_THRESHOLD} &nbsp;'
+        f'<p style="font-size:12px;color:#34c759;letter-spacing:-0.12px">'
+        f'● Model loaded — {MODEL_PATH} &nbsp;|&nbsp; conf={CONF_THRESHOLD} &nbsp;'
         f'iou={IOU_THRESHOLD} &nbsp;classes={len(CLASS_NAMES)}</p>',
         unsafe_allow_html=True
     )
@@ -303,8 +559,8 @@ with tab_video:
                         overall = offset + pct * weight
                         progress_bar.progress(min(overall, 1.0))
                         status_text.markdown(
-                            f'<span style="font-family:ui-monospace,monospace;'
-                            f'font-size:12px;color:#5e6ad2">'
+                            f'<span style="'
+                            f'font-size:13px;color:#0066cc;letter-spacing:-0.12px">'
                             f'⏳ {label}: frame {current_frame}/{total_frames} '
                             f'({int(pct*100)}%)</span>',
                             unsafe_allow_html=True,
@@ -318,8 +574,8 @@ with tab_video:
                     with open(rp,"wb") as f: f.write(rv.getvalue())
 
                     status_text.markdown(
-                        '<span style="font-family:ui-monospace,monospace;'
-                        'font-size:12px;color:#5e6ad2">'
+                        '<span style="'
+                        'font-size:13px;color:#0066cc;letter-spacing:-0.12px">'
                         '⏳ Processing LEFT camera...</span>',
                         unsafe_allow_html=True,
                     )
@@ -327,8 +583,8 @@ with tab_video:
                                        progress_callback=make_progress_cb("LEFT", 0.0, 0.5))
 
                     status_text.markdown(
-                        '<span style="font-family:ui-monospace,monospace;'
-                        'font-size:12px;color:#5e6ad2">'
+                        '<span style="'
+                        'font-size:13px;color:#0066cc;letter-spacing:-0.12px">'
                         '⏳ Processing RIGHT camera...</span>',
                         unsafe_allow_html=True,
                     )
@@ -337,9 +593,9 @@ with tab_video:
 
                 progress_bar.progress(1.0)
                 status_text.markdown(
-                    '<span style="font-family:ui-monospace,monospace;'
-                    'font-size:12px;color:#27a644">'
-                    '✓ Processing complete!</span>',
+                    '<span style="'
+                    'font-size:13px;color:#34c759;letter-spacing:-0.12px">'
+                    '✓ Processing complete</span>',
                     unsafe_allow_html=True,
                 )
 
@@ -386,17 +642,17 @@ with tab_video:
         <div class="summary-bar">
           <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
             <div><span class="summary-num">{total}</span><span class="summary-label">Total Tanks</span></div>
-            <div><span class="summary-num" style="color:#8b5cf6">{res['total_coaches_counted']}</span>
+            <div><span class="summary-num" style="color:#0066cc">{res['total_coaches_counted']}</span>
                  <span class="summary-label">Coaches (L:{lcc}·R:{rcc})</span></div>
-            <div><span class="summary-num" style="color:#8a8f98">{res['left_tanks']}</span>
+            <div><span class="summary-num" style="color:#6e6e73">{res['left_tanks']}</span>
                  <span class="summary-label">Left Tanks</span></div>
-            <div><span class="summary-num" style="color:#8a8f98">{res['right_tanks']}</span>
+            <div><span class="summary-num" style="color:#6e6e73">{res['right_tanks']}</span>
                  <span class="summary-label">Right Tanks</span></div>
-            <div><span class="summary-num" style="color:#27a644">{total-maint}</span>
+            <div><span class="summary-num" style="color:#34c759">{total-maint}</span>
                  <span class="summary-label">Normal</span></div>
-            <div><span class="summary-num" style="color:#f44336">{maint}</span>
+            <div><span class="summary-num" style="color:#ff3b30">{maint}</span>
                  <span class="summary-label">Maintenance Req.</span></div>
-            <div><span class="summary-num" style="font-size:13px;color:#62666d">{res['job_id']}</span>
+            <div><span class="summary-num" style="font-size:14px;color:#86868b">{res['job_id']}</span>
                  <span class="summary-label">Job ID</span></div>
           </div>
         </div>
@@ -417,7 +673,7 @@ with tab_video:
                         if ann and os.path.exists(ann):
                             st.image(ann, caption=f"Full Frame — {r['tank_id']}", width=800)
                 else:
-                    st.markdown('<p style="color:#444;font-size:13px">No tanks detected.</p>',
+                    st.markdown('<p style="color:#86868b;font-size:14px">No tanks detected.</p>',
                                 unsafe_allow_html=True)
 
         st.markdown(f"""
@@ -558,13 +814,12 @@ with tab_photo:
                             for cn, cf in sorted(r["_detected"].items(), key=lambda x:-x[1]):
                                 color = CLASS_COLORS_BGR.get(cn,(150,150,150))
                                 hx    = "#{:02x}{:02x}{:02x}".format(color[2],color[1],color[0])
-                                pills += (f'<span class="det-pill" style="border-color:{hx};color:{hx}">'
-                                          f'{cn} {cf:.2f}</span>')
+                                pills += (f'<span class="det-pill" style="border-color:{hx};color:{hx}">'\n                                          f'{cn} {cf:.2f}</span>')
                             st.markdown(f'<div style="margin-bottom:8px">{pills}</div>',
                                         unsafe_allow_html=True)
                         else:
                             st.markdown(
-                                '<p style="color:#444;font-size:12px;margin-bottom:8px">'
+                                '<p style="color:#86868b;font-size:12px;margin-bottom:8px">'
                                 'No detections above threshold.</p>',
                                 unsafe_allow_html=True
                             )
