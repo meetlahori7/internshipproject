@@ -82,8 +82,13 @@ st.markdown("""
 
 html, body, [class*="css"], .stApp {
   font-family: var(--apple-font) !important;
-  background-color: var(--apple-bg) !important;
   color: var(--apple-ink) !important;
+}
+
+.stApp, [data-testid="stAppViewContainer"] {
+  background-color: var(--apple-bg) !important;
+  background-image: radial-gradient(var(--apple-hairline) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
 }
 
 /* ── Header ── */
