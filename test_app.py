@@ -593,15 +593,24 @@ with tab_video:
 
     if lv and rv:
         with st.expander("⚙️ Performance & Frame Sampling Settings", expanded=False):
-            frame_skip_val = st.select_slider(
-                "Frame Skip Rate",
-                options=[5, 10, 15, 20, 25, 30],
-                value=15,
-                key="test_frame_skip",
-                help="Higher frame skip processes fewer frames per video.\n"
-                     "• Skip 5: ~2,100 frames for 7-min video\n"
-                     "• Skip 15: ~700 frames for 7-min video (Default — 3x Faster)\n"
-                     "• Skip 25: ~420 frames for 7-min video (5x Faster)"
+            target_fps_val = st.selectbox(
+                "Target Processing FPS (Frames analyzed per second of video)",
+                options=[0.5, 1.0, 1.5, 2.0, 5.0],
+                index=1,
+                key="test_target_fps",
+                help="Controls how many frames per second of video duration are sampled for YOLO detection.\n"
+                     "• 0.5 FPS: ~60 frames for 2-min video (Fastest)\n"
+                     "• 1.0 FPS: ~120 frames for 2-min video (Recommended — 83% fewer frames)\n"
+                     "• 1.5 FPS: ~180 frames for 2-min video\n"
+                     "• 2.0 FPS: ~240 frames for 2-min video\n"
+                     "• 5.0 FPS: ~600 frames for 2-min video (Legacy)",
+                format_func=lambda x: {
+                    0.5: "0.5 FPS (Fastest — ~60 frames for 2-min video)",
+                    1.0: "1.0 FPS (Recommended — ~120 frames for 2-min video)",
+                    1.5: "1.5 FPS (Balanced — ~180 frames for 2-min video)",
+                    2.0: "2.0 FPS (High Precision — ~240 frames for 2-min video)",
+                    5.0: "5.0 FPS (Legacy Heavy — ~600 frames for 2-min video)",
+                }.get(x, f"{x} FPS")
             )
 
         if st.button("▶  RUN VIDEO INSPECTION", use_container_width=True,
@@ -642,7 +651,7 @@ with tab_video:
                     )
                     lr = process_video(lp, camera_side="LEFT",
                                        progress_callback=make_progress_cb("LEFT", 0.0, 0.5),
-                                       frame_skip=frame_skip_val)
+                                       target_fps=target_fps_val)
 
                     status_text.markdown(
                         '<span style="'
@@ -652,7 +661,7 @@ with tab_video:
                     )
                     rr = process_video(rp, camera_side="RIGHT",
                                        progress_callback=make_progress_cb("RIGHT", 0.5, 0.5),
-                                       frame_skip=frame_skip_val)
+                                       target_fps=target_fps_val)
 
                 progress_bar.progress(1.0)
                 status_text.markdown(

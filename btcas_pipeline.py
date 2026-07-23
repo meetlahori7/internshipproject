@@ -456,8 +456,9 @@ def process_video(
     video_path: str,
     camera_side: str,
     progress_callback=None,
-    frame_skip: int = FRAME_SKIP,
-    inference_every_n: int = INFERENCE_EVERY_N,
+    frame_skip: Optional[int] = None,
+    target_fps: Optional[float] = 1.0,
+    inference_every_n: Optional[int] = None,
 ) -> list[dict]:
     """
     Process a video file frame-by-frame, producing one tank report dict per
@@ -469,20 +470,35 @@ def process_video(
         camera_side:       "LEFT" or "RIGHT".
         progress_callback: Optional callable(current_frame, total_frames)
                            for progress reporting (e.g. Streamlit progress bar).
-        frame_skip:        Number of frames to skip per iteration (default 15).
-        inference_every_n: Run YOLO model every N frames (default 15).
+        frame_skip:        Explicit number of frames to skip. If None, derived from target_fps.
+        target_fps:        Target processing FPS (frames sampled per second of video, default 1.0).
+        inference_every_n: Run YOLO model every N frames.
 
     Uses frame skipping (YOLO every inference_every_n frames) and pre-inference
     resize for speed on CPU.
 
     Returns a list of tank-report dicts (see module docstring for schema).
     """
+    import math
+
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise RuntimeError(f"Could not open video: {video_path}")
 
     fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+    if fps <= 0 or math.isnan(fps):
+        fps = 25.0
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+
+    # Derive frame_skip from target_fps if not explicitly set
+    if frame_skip is None:
+        if target_fps is not None and target_fps > 0:
+            frame_skip = max(1, int(round(fps / target_fps)))
+        else:
+            frame_skip = FRAME_SKIP
+
+    if inference_every_n is None:
+        inference_every_n = frame_skip
 
     tracks: list[TankTrack] = []
     current_max_id = [0]
@@ -553,7 +569,8 @@ def process_video(
 
     cap.release()
 
-    min_tank_frames = max(2, int(round(40 / frame_skip)))
+    effective_fps = fps / max(1, frame_skip)
+    min_tank_frames = max(1, int(round(1.2 * effective_fps)))
     finalized: list[TankTrack] = [
         t for t in tracks if t.frame_count >= min_tank_frames and t.camera_side == camera_side
     ]
