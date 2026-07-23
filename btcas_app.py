@@ -419,8 +419,19 @@ with col2:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────
-# INSPECT BUTTON
+# INSPECT BUTTON & SETTINGS
 # ─────────────────────────────────────────
+with st.expander("⚙️ Performance & Frame Sampling Settings", expanded=False):
+    frame_skip_val = st.select_slider(
+        "Frame Skip Rate",
+        options=[5, 10, 15, 20, 25, 30],
+        value=15,
+        help="Higher frame skip processes fewer frames per video, drastically speeding up inspection.\n"
+             "• Skip 5: ~2,100 frames for 7-min video\n"
+             "• Skip 15: ~700 frames for 7-min video (Default — 3x Faster)\n"
+             "• Skip 25: ~420 frames for 7-min video (5x Faster)"
+    )
+
 can_inspect = left_video and right_video
 
 if not (left_video and right_video):
@@ -443,8 +454,8 @@ if can_inspect:
                     with open(right_path, "wb") as right_file:
                         right_file.write(right_video.getvalue())
 
-                    left_reports = process_video(left_path, camera_side="LEFT")
-                    right_reports = process_video(right_path, camera_side="RIGHT")
+                    left_reports = process_video(left_path, camera_side="LEFT", frame_skip=frame_skip_val)
+                    right_reports = process_video(right_path, camera_side="RIGHT", frame_skip=frame_skip_val)
 
                     all_reports = left_reports + right_reports
                     all_reports.sort(key=lambda x: (x["camera_side"], x["tank_id"]))

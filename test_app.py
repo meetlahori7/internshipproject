@@ -592,6 +592,18 @@ with tab_video:
         st.info("Upload both videos to run the full inspection pipeline.")
 
     if lv and rv:
+        with st.expander("⚙️ Performance & Frame Sampling Settings", expanded=False):
+            frame_skip_val = st.select_slider(
+                "Frame Skip Rate",
+                options=[5, 10, 15, 20, 25, 30],
+                value=15,
+                key="test_frame_skip",
+                help="Higher frame skip processes fewer frames per video.\n"
+                     "• Skip 5: ~2,100 frames for 7-min video\n"
+                     "• Skip 15: ~700 frames for 7-min video (Default — 3x Faster)\n"
+                     "• Skip 25: ~420 frames for 7-min video (5x Faster)"
+            )
+
         if st.button("▶  RUN VIDEO INSPECTION", use_container_width=True,
                      type="primary", key="btn_vid"):
             try:
@@ -629,7 +641,8 @@ with tab_video:
                         unsafe_allow_html=True,
                     )
                     lr = process_video(lp, camera_side="LEFT",
-                                       progress_callback=make_progress_cb("LEFT", 0.0, 0.5))
+                                       progress_callback=make_progress_cb("LEFT", 0.0, 0.5),
+                                       frame_skip=frame_skip_val)
 
                     status_text.markdown(
                         '<span style="'
@@ -638,7 +651,8 @@ with tab_video:
                         unsafe_allow_html=True,
                     )
                     rr = process_video(rp, camera_side="RIGHT",
-                                       progress_callback=make_progress_cb("RIGHT", 0.5, 0.5))
+                                       progress_callback=make_progress_cb("RIGHT", 0.5, 0.5),
+                                       frame_skip=frame_skip_val)
 
                 progress_bar.progress(1.0)
                 status_text.markdown(

@@ -48,8 +48,8 @@ CONFIRMATION_GAP_FRAMES = 25
 TANK_OVERLAP_IOU = 0.2
 CHILD_OVERLAP_THRESHOLD = 0.25
 
-INFERENCE_EVERY_N = 5
-FRAME_SKIP = 5
+INFERENCE_EVERY_N = 15
+FRAME_SKIP = 15
 RESIZE_WIDTH = 640
 RESIZE_HEIGHT = 480
 
@@ -456,6 +456,8 @@ def process_video(
     video_path: str,
     camera_side: str,
     progress_callback=None,
+    frame_skip: int = FRAME_SKIP,
+    inference_every_n: int = INFERENCE_EVERY_N,
 ) -> list[dict]:
     """
     Process a video file frame-by-frame, producing one tank report dict per
@@ -467,8 +469,10 @@ def process_video(
         camera_side:       "LEFT" or "RIGHT".
         progress_callback: Optional callable(current_frame, total_frames)
                            for progress reporting (e.g. Streamlit progress bar).
+        frame_skip:        Number of frames to skip per iteration (default 15).
+        inference_every_n: Run YOLO model every N frames (default 15).
 
-    Uses frame skipping (YOLO every INFERENCE_EVERY_N frames) and pre-inference
+    Uses frame skipping (YOLO every inference_every_n frames) and pre-inference
     resize for speed on CPU.
 
     Returns a list of tank-report dicts (see module docstring for schema).
@@ -489,11 +493,11 @@ def process_video(
     frames_with_tank_set: set[int] = set()
 
     cached_boxes: list[Box] = []
-    last_infer_frame = -INFERENCE_EVERY_N - 1
+    last_infer_frame = -inference_every_n - 1
 
     frame_idx = -1
     processed_count = 0
-    total_processed = (total_frames + FRAME_SKIP - 1) // FRAME_SKIP if total_frames > 0 else 0
+    total_processed = (total_frames + frame_skip - 1) // frame_skip if total_frames > 0 else 0
 
     while True:
         ret, frame = cap.read()
@@ -506,7 +510,7 @@ def process_video(
         if progress_callback and total_processed > 0:
             progress_callback(processed_count, total_processed)
 
-        if frame_idx - last_infer_frame >= INFERENCE_EVERY_N:
+        if frame_idx - last_infer_frame >= inference_every_n:
             cached_boxes = _run_inference(frame)
             last_infer_frame = frame_idx
 
@@ -540,8 +544,8 @@ def process_video(
             if cb.cls != CLS_TANK:
                 all_detections.append({"frame": frame_idx, "cls": cb.cls})
 
-        # Fast-skip the next FRAME_SKIP - 1 frames
-        for _ in range(FRAME_SKIP - 1):
+        # Fast-skip the next frame_skip - 1 frames
+        for _ in range(frame_skip - 1):
             if cap.grab():
                 frame_idx += 1
             else:
@@ -549,8 +553,9 @@ def process_video(
 
     cap.release()
 
+    min_tank_frames = max(2, int(round(40 / frame_skip)))
     finalized: list[TankTrack] = [
-        t for t in tracks if t.frame_count >= 8 and t.camera_side == camera_side
+        t for t in tracks if t.frame_count >= min_tank_frames and t.camera_side == camera_side
     ]
 
     tank_track_count = len(finalized)
